@@ -22,10 +22,10 @@ Documentation of how to do data collection and analysis of tweets
     `xcode-select --install`
 
 2. Install Homebrew <br/>
-    1. Paste following code into the terminal window:<br/>
+    1. Paste the following code into the terminal window:<br/>
     `/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
     
-    2. Add Homebrew to your path. Paste following code into the terminal windows: <br/>
+    2. Add Homebrew to your path. Paste the following code into the terminal windows: <br/>
     `export PATH="/usr/local/bin:/usr/local/sbin:$PATH"`
   
 3. Install Python (2.7) via terminal:<br/>
