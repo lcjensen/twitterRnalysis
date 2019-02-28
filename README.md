@@ -40,4 +40,20 @@ Documentation of how to do data collection and analysis of tweets
 3. Install packages for R:<br/>    
     
     
-### Install Twitter Scraper
+## Two ways to scrape Twitter:
+1. Using Twitter own API via a package in R (limited to tweets from the last 5-6 days
+2. Using Python script written by @Jefferson-Henrique (no limitations)
+
+### Method 1: Using the Twitter API in R
+1. Setup Twitter account
+    - Validation process might take a few days
+    - Guide on how to get developer access can be found [here](https://towardsdatascience.com/access-data-from-twitter-api-using-r-and-or-python-b8ac342d3efe) 
+2. Install the following packages in R:
+    - twitteR, tidytext, dplyr, ggplot2, stringr, data.table, tm, wordcloud, syuzhet, devtools, widyr, tidyr, igraph, ggraph
+    - ex: `install.packages("twitteR")`
+3. Open the twitter.Rmd file (this repository)
+4. Replace the API keys and access tokens in chunk 1 of the Rmd file with the information from your Twitter developer account.
+5. Run the chunk 1
+6. Define search parameters in chunk 2
+7. Run chunk 2
+8. Run chunk 3 to save the file locally as excel.
