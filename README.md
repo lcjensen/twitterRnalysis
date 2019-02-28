@@ -22,7 +22,7 @@ Documentation of how to do data collection and analysis of tweets
 1. Setup Twitter account
     - Validation process might take a few days
     - Guide on how to get developer access can be found [here](https://towardsdatascience.com/access-data-from-twitter-api-using-r-and-or-python-b8ac342d3efe) 
-2. Open the twitter.Rmd file (this repository)
+2. Open the twitterStudent.Rmd file (this repository)
 3. Replace the API keys and access tokens in chunk 1 of the Rmd file with the information from your Twitter developer account.
 4. Run chunk 1
 5. Define search parameters in chunk 2
