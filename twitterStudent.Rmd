@@ -1,0 +1,140 @@
+---
+title: "Twitter Data Mining"
+author: "Lars Christian Jensen"
+date: "13/9/2018"
+output: html_document
+---
+
+#1. Setup
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(twitteR)
+library(tidytext)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(data.table)
+library(tm)
+library(wordcloud)
+library(syuzhet)
+library(devtools)
+library(widyr)
+library(tidyr)
+library(igraph)
+library(ggraph)
+library(openssl)
+library(httpuv)
+
+#replace with values from the twitter app
+#put inside citation marks
+
+#Consumer API keys
+consumer_key <- ''
+consumer_secret <- ''
+
+#Access token & access token secret
+access_token <- ''
+access_secret <- ''
+
+setup_twitter_oauth(consumer_key, consumer_secret, access_token, access_secret)
+```
+
+#2. Extract and transform data
+```{r}
+
+fn_twitter <- searchTwitter("#vaccine",n=10000,lang="en") # <- define hashtag to investigate
+fn_twitter_df <- twListToDF(fn_twitter) # Convert to data frame
+
+fn_twitter_df$hashtags <- sapply(str_extract_all(fn_twitter_df$text, "#\\S+"), paste, collapse=", ") #<- extract hashtags
+fn_twitter_df$hashtags <- tolower(fn_twitter_df$hashtags)
+
+fn_twitter_df$hashtags <- gsub("[.]","",fn_twitter_df$hashtags) <- #cleanup 
+fn_twitter_df$hashtags <- gsub("[...]","",fn_twitter_df$hashtags)
+fn_twitter_df$hashtags <- gsub(",","",fn_twitter_df$hashtags) 
+fn_twitter_df$hashtags <- gsub("#vaccine","",fn_twitter_df$hashtags) <- #remove the hashtag under investigation from the analysis
+
+
+```
+
+
+#3. Save file as Excel
+```{r}
+write.xlsx(fn_twitter_df, file = paste0("twitter.xlsx"))
+```
+
+
+#wordcloud
+```{r}
+
+wordcloud(fn_twitter_df$hashtags,random.order=FALSE) # produce the wordcloud
+```
+
+#sentiment analysis
+```{r}
+fn_twitter_df$text2 <- fn_twitter_df$text
+fn_twitter_df$text2 <- tolower(fn_twitter_df$text2)
+
+fn_twitter_df$text2 <- gsub("[.]","",fn_twitter_df$text2)
+fn_twitter_df$text2 <- gsub(",","",fn_twitter_df$text2)
+fn_twitter_df$text2 <- gsub("@","",fn_twitter_df$text2)
+fn_twitter_df$text2 <- gsub("#","",fn_twitter_df$text2)
+fn_twitter_df$text2 <- gsub("rt","",fn_twitter_df$text2)
+fn_twitter_df$text2 <- gsub("http","",fn_twitter_df$text2) # <- clean up text 
+
+fn_twitter_df$bing <- get_sentiment(fn_twitter_df$text2,  method="bing") # <- produce sentiment analysis 
+#sentiment analysis goes from -3 to 3 
+#a positive score represents a negative stance, a positive score a negative stance
+```
+
+Distribution:
+```{r}
+table(fn_twitter_df$bing) # display distribution of the sentiment analysis
+```
+
+Make word cloud based on the sentiment analysis (positive / negative)
+```{r}
+fn_twitter_pos <- fn_twitter_df[fn_twitter_df$bing > 0,]
+fn_twitter_neg <- fn_twitter_df[fn_twitter_df$bing < 0,]
+
+wordcloud(fn_twitter_pos$hashtags,random.order=FALSE) #positive stance
+wordcloud(fn_twitter_neg$hashtags,random.order=FALSE) #negative stance
+
+```
+
+
+
+#network analysis
+```{r}
+#analysis of word pairs
+data("stop_words")
+
+pairedWords <- fn_twitter_df %>%
+  dplyr::select(text2) %>%
+  unnest_tokens(pairedWords, text2, token = "ngrams", n = 2)
+
+pairedWords %>%
+  count(pairedWords, sort = TRUE)
+
+separated_words <- pairedWords %>%
+  separate(pairedWords, c("word1", "word2"), sep = " ")
+
+tweets_filtered <- separated_words %>%
+  filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word)
+
+words_counts <- tweets_filtered %>%
+  count(word1, word2, sort = TRUE)
+
+words_counts %>%
+        filter(n >= 24) %>%
+        graph_from_data_frame() %>%
+        ggraph(layout = "fr") +
+        geom_edge_link(aes(edge_alpha = n, edge_width = n)) +
+        geom_node_point(color = "darkslategray4", size = 3) +
+        geom_node_text(aes(label = name), vjust = 1.8, size = 3) +
+        labs(title = "Word Network: Tweets using the hashtag - vaccine",
+             subtitle = "Text mining twitter data ",
+             x = "", y = "")
+
+```
