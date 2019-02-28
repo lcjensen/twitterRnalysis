@@ -6,7 +6,7 @@ Documentation of how to do data collection and analysis of tweets
 3. Data manipulation in R and export to Microsoft Excel<br/>
 
 # Two ways to scrape Twitter:
-1. Using Twitter own API via a package in R (limited to tweets from the last 5-6 days
+1. Using Twitter own API via a package in R (limited to tweets from the last 5-6 days)
 2. Using Python script written by @Jefferson-Henrique (no limitations)
 
 ## Method 1: Using the Twitter API in R
