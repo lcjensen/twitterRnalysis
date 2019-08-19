@@ -65,4 +65,4 @@ The Rmd-file also includes chunks with which you can produce wordclouds, carry o
     - `python Exporter.py --username sometwitteruser`
     - You can also search for topics:
     - `python Exporter.py --querysearch "some great topic"`
-5. Output is saved as a CSV-file as `output_got.csv` which can be opened by Microsoft Excel
+5. Output is saved as a CSV-file as `output_got.csv` which can be opened by Microsoft Excel or R
