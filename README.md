@@ -15,19 +15,14 @@ Documentation of how to do data collection and analysis of tweets
 1. [Download R](https://cran.r-project.org/)
 2. [Download RStudio](https://www.rstudio.com/products/rstudio/download/)
 3. Install packages for R:<br/>   
-    - twitteR, tidytext, dplyr, ggplot2, stringr, data.table, tm, wordcloud, syuzhet, devtools, widyr, tidyr, igraph, ggraph
+    - rtweet, tidytext, dplyr, ggplot2, stringr, data.table, tm, wordcloud2, syuzhet, devtools, widyr, tidyr, igraph, ggraph, RColorBrewer,openxlsx
     - ex: `install.packages("twitteR")`
 
 ### Process
-1. Setup Twitter account
-    - Validation process might take a few days
-    - Guide on how to get developer access can be found [here](https://towardsdatascience.com/access-data-from-twitter-api-using-r-and-or-python-b8ac342d3efe) 
-2. Open the twitterStudent.Rmd file (this repository)
-3. Replace the API keys and access tokens in chunk 1 of the Rmd file with the information from your Twitter developer account.
-4. Run chunk 1
+1. Open the twitterNew.Rmd file (this repository)
+4. Run chunk 1 to setup libraries
 5. Define search parameters in chunk 2
-6. Run chunk 2
-7. Run chunk 3 to save the file locally as excel.
+6. Run chunk 2 to carry out a search and save the results to an Excel file
 
 The Rmd-file also includes chunks with which you can produce wordclouds, carry out sentiment analysis and do network (collocation) analysis of word pairs. 
 
