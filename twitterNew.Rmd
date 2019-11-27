@@ -1,0 +1,106 @@
+---
+title: "Twitter Data Mining"
+author: "Lars Christian Jensen"
+date: "13/9/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidytext)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(data.table)
+library(tm)
+library(wordcloud)
+library(syuzhet)
+library(devtools)
+library(widyr)
+library(tidyr)
+library(igraph)
+library(ggraph)
+library(openssl)
+library(rtweet)
+library(RColorBrewer)
+library(wordcloud2)
+library(openxlsx)
+
+```
+
+#rtweets
+```{r}
+search <- "obama"
+
+rt <- search_tweets(search, n = 1000, include_rts = FALSE)
+write.xlsx(rt, file = "writeXLSX1.xlsx")
+
+
+```
+
+
+#wordcloud
+```{r}
+
+rt2 <- unnest(rt, hashtags)
+rt2 <- data.frame(table(rt2$hashtags))
+rt2$Var1 <- tolower(rt2$Var1)
+rt2 <- rt2 %>% group_by(Var1) %>% summarise_all(funs(sum))
+rt2 <- subset(rt2, Var1!=search)
+
+wordcloud2(rt2)
+```
+
+#sentiment analysis
+```{r}
+rt$text2 <- rt$text
+rt$text2 <- tolower(rt$text2)
+
+rt$text2 <- gsub("[.]","",rt$text2)
+rt$text2 <- gsub(",","",rt$text2)
+rt$text2 <- gsub("@","",rt$text2)
+rt$text2 <- gsub("#","",rt$text2)
+rt$text2 <- gsub("rt","",rt$text2)
+rt$text2 <- gsub("http","",rt$text2) # <- clean up text 
+rt$text2 <- gsub("[^\x01-\x7F]", "", rt$text2)
+
+rt$bing <- get_sentiment(rt$text2,  method="bing") # <- produce sentiment analysis 
+table(rt$bing) # display distribution of the sentiment analysis
+```
+
+
+#network analysis
+```{r}
+#analysis of word pairs
+data("stop_words")
+
+pairedWords <- rt %>%
+  dplyr::select(text2) %>%
+  unnest_tokens(pairedWords, text2, token = "ngrams", n = 2)
+
+pairedWords %>%
+  count(pairedWords, sort = TRUE)
+
+separated_words <- pairedWords %>%
+  separate(pairedWords, c("word1", "word2"), sep = " ")
+
+tweets_filtered <- separated_words %>%
+  filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word)
+
+words_counts <- tweets_filtered %>%
+  count(word1, word2, sort = TRUE)
+
+words_counts %>%
+        filter(n >= 3) %>%
+        graph_from_data_frame() %>%
+        ggraph(layout = "fr") +
+        geom_edge_link(aes(edge_alpha = n, edge_width = n)) +
+        geom_node_point(color = "darkslategray4", size = 3) +
+        geom_node_text(aes(label = name), vjust = 1.8, size = 3) +
+        labs(title = "Word Network: Tweets",
+             subtitle = "Text mining twitter data ",
+             x = "", y = "")
+
+```
